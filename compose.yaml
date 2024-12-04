@@ -1,0 +1,17 @@
+networks:
+  common:
+    name: common
+
+
+services:
+  attendance:
+    container_name: attendance
+    restart: unless-stopped
+    image: chaimfn/attendance-app:02
+    networks:
+      - common
+    ports:
+      - "3030:3000"
+    volumes:
+      - ~/docker-apps/attendance/data:/app/data
+
