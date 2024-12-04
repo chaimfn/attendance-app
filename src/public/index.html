@@ -14,7 +14,32 @@
             font-family: Arial, sans-serif;
             font-size: 16px;
             text-align: center;
-            margin-top: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 50px;
+        }
+
+        h1 {
+            margin-bottom: 50px;
+            /* Adds space between title and the content sections */
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            /* Distribute space between the two sections */
+            width: 80%;
+            /* Set the container width */
+        }
+
+        .section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 45%;
+            /* Each section will take 45% of the width of the container */
         }
 
         button {
@@ -22,6 +47,7 @@
             padding: 15px 25px;
             margin: 10px;
             cursor: pointer;
+            width: 200px;
         }
 
         table th {
@@ -34,12 +60,11 @@
             margin: 10px;
         }
 
-        #report-area {
-            width: 430px;
-            margin: 0 auto;
+        #report-container {
+            width: 100%;
         }
 
-        #report-area table {
+        #report-container table {
             width: 100%;
         }
 
@@ -47,25 +72,50 @@
             font-size: 16px;
             padding: 5px 7px;
         }
+
+        #month-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #month-section button {
+            width: inherit;
+        }
+
+        /* To disable the download button with a faded style when it's not clickable */
+        button:disabled {
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
 <body>
 
-    <h1>דוח נוכחות</h1>
+    <!-- Title "דיווח נוכחות" -->
+    <h1>דיווח נוכחות</h1>
 
-    <button id="entryButton">כניסה</button>
-    <button id="exitButton">יציאה</button>
+    <!-- Container for both sections -->
+    <div class="container">
+        <!-- First section: Entry and Exit buttons -->
+        <div class="section">
+            <button id="entryButton">כניסה</button>
+            <button id="exitButton">יציאה</button>
+        </div>
 
-    <div id="report-area">
-        <b>הצג חודש:</b>
-        &nbsp;
-        <!-- Dropdown for selecting month -->
-        <select id="monthSelect">
-            <option value="">בחר חודש</option>
-        </select>
-        <div id="report-container"></div>
-        <button id="downloadReportButton" disabled>הורד דוח</button>
+        <!-- Second section: Report display and download -->
+        <div class="section" id="report-area">
+            <!-- Dropdown for selecting month -->
+            <div id="month-section">
+                <b>הצג חודש:</b>
+                <select id="monthSelect">
+                    <option value="">בחר</option>
+                </select>
+                <button id="downloadReportButton" disabled>הורד דוח</button>
+            </div>
+            <div id="report-container"></div>
+        </div>
     </div>
 
     <script>
@@ -110,7 +160,7 @@
 
             if (!selectedMonth) {
                 document.getElementById('report-container').innerHTML = ''; // Clear the report container if no month is selected
-                document.getElementById('downloadReportButton').setAttribute("disabled", "disabled")
+                document.getElementById('downloadReportButton').setAttribute("disabled", "disabled");
                 return;
             }
 
