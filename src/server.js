@@ -38,16 +38,17 @@ function logAttendance(action) {
     fs.readFile(csvFileName, 'utf8', (err, data) => {
         if (err) throw err;
 
-        // קריאת רשומות קיימות מהקובץ
+        // קריאת רשומות קיימות מהקובץ ומסננים שורות ריקות אם יש
         const records = data.split('\n').slice(1).map(line => {
             const columns = line.split(',');
+            if (columns.length < 4) return null;  // מסננים שורות ריקות
             return {
                 dayOfMonth: columns[0],
                 dayOfWeek: columns[1],
                 entry: columns[2],
                 exit: columns[3]
             };
-        });
+        }).filter(record => record !== null);  // מסננים כל ערך null (שורות ריקות)
 
         // פורמט של היום, כולל היום בשבוע
         const formattedDayOfMonth = `${currentDay}`;
@@ -92,7 +93,7 @@ function logAttendance(action) {
             }
         }
 
-        // כותבים את הרשומות המעודכנות חזרה לקובץ CSV
+        // כותבים את הרשומות המעודכנות חזרה לקובץ CSV, ללא שורות ריקות
         const csvWriter = createObjectCsvWriter({
             path: csvFileName,
             header: [
