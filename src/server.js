@@ -1,7 +1,8 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const moment = require('moment');
+const moment = require('moment-timezone');
+const TZ = 'Asia/Jerusalem';
 const { createObjectCsvWriter } = require('csv-writer');
 
 const app = express();
@@ -11,14 +12,14 @@ app.use(express.static('public')); // הגדרת תיקיית הסטטיים
 app.use(express.json()); // תמיכה בקלט JSON
 
 // שם הקובץ שהאפליקציה תכתוב אליו
-const currentMonth = moment().format('YYYY-MM');
+const currentMonth = moment().tz(TZ).format('YYYY-MM');
 const csvFileName = `./data/${currentMonth}.csv`;
 
 // פונקציה לעדכון דוח הנוכחות
 function logAttendance(action) {
-    const currentDay = moment().format('DD'); // מספר היום בחודש
-    const currentWeekday = moment().format('ddd'); // שם היום בשבוע
-    const currentTime = moment().format('HH:mm'); // זמן בלי שניות (רק שעה ודקה)
+    const currentDay = moment().tz(TZ).format('DD'); // מספר היום בחודש
+    const currentWeekday = moment().tz(TZ).format('ddd'); // שם היום בשבוע
+    const currentTime = moment().tz(TZ).format('HH:mm'); // זמן בלי שניות (רק שעה ודקה)
 
     // אם הקובץ לא קיים, ניצור אותו עם כותרות ראשוניות
     if (!fs.existsSync(csvFileName)) {
@@ -61,7 +62,7 @@ function logAttendance(action) {
             if (existingEntry) {
                 // אם יש כניסה פתוחה, לא נוסיף שורה חדשה
                 console.log('Entry already recorded for today:', formattedDayOfMonth, formattedDayOfWeek);
-            } 
+            }
             else {
                 // אם לא קיימת כניסת יום, נוסיף כניסה חדשה בשורה נפרדת
                 const newRecord = {
@@ -73,13 +74,13 @@ function logAttendance(action) {
                 records.push(newRecord);
                 console.log('Entry recorded for today:', formattedDayOfMonth, formattedDayOfWeek, currentTime);
             }
-        } 
+        }
         else if (action === 'exit') {
             if (existingEntry) {
                 // אם יש כניסה פתוחה, נוסיף את זמן היציאה באותה שורה
                 existingEntry.exit = currentTime;
                 console.log('Exit recorded for today:', formattedDayOfMonth, formattedDayOfWeek, currentTime);
-            } 
+            }
             else {
                 // אם אין כניסת יום פתוחה, נוסיף יציאה בשורה חדשה
                 const newRecord = {
