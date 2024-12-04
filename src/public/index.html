@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>דוח נוכחות</title>
     <style>
+        html {
+            direction: rtl;
+        }
+
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -18,6 +22,19 @@
             margin: 10px;
             cursor: pointer;
         }
+
+        #report-container {
+            width: 430px;
+            margin: 0 auto;
+        }
+
+        #report-container table {
+            width: 100%;
+        }
+
+        #report-container table th {
+            background-color: lightgray;
+        }
     </style>
 </head>
 
@@ -27,7 +44,10 @@
 
     <button id="entryButton">כניסה</button>
     <button id="exitButton">יציאה</button>
-    <button id="reportButton">הצג דוח</button>
+    <button id="showReportButton">הצג דוח</button>
+    <button id="downloadReportButton">הורד דוח</button>
+
+    <div id="report-container"></div>
 
     <script>
         document.getElementById('entryButton').addEventListener('click', function () {
@@ -42,8 +62,21 @@
                 .then(data => alert(data));
         });
 
-        document.getElementById('reportButton').addEventListener('click', function () {
-            window.location.href = '/report';
+        document.getElementById('downloadReportButton').addEventListener('click', function () {
+            window.location.href = '/report/download';
+        });
+
+        document.getElementById('showReportButton').addEventListener('click', function () {
+            // Perform AJAX request to get the report HTML
+            fetch('/report/get')
+                .then(response => response.text())
+                .then(data => {
+                    // Insert the HTML into the #report-container div
+                    document.getElementById('report-container').innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error fetching the report:', error);
+                });
         });
     </script>
 

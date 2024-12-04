@@ -123,8 +123,58 @@ app.post('/exit', (req, res) => {
 });
 
 // נתיב להורדת דוח נוכחות (הצגת דוח)
-app.get('/report', (req, res) => {
+app.get('/report/download', (req, res) => {
     res.sendFile(path.join(__dirname, csvFileName));
+});
+
+// נתיב להצגת דוח נוכחות כ-HTML
+app.get('/report/get', (req, res) => {
+    fs.readFile(csvFileName, 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).send('Error reading the attendance report');
+        }
+
+        // פיצול הקובץ לשורות ומסננים שורות ריקות
+        const records = data.split('\n').slice(1).map(line => {
+            const columns = line.split(',');
+            return {
+                dayOfMonth: columns[0],
+                dayOfWeek: columns[1],
+                entry: columns[2],
+                exit: columns[3]
+            };
+        }).filter(record => record.dayOfMonth && record.dayOfWeek && record.entry && record.exit);  // מסננים שורות ריקות
+
+        let htmlContent = `
+        <table>
+            <thead>
+                <tr>
+                    <th>תאריך</th>
+                    <th>יום</th>
+                    <th>כניסה</th>
+                    <th>יציאה</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+        // הוספת כל הרשומות לטבלה
+        records.forEach(record => {
+            htmlContent += `
+            <tr>
+                <td>${record.dayOfMonth}</td>
+                <td>${record.dayOfWeek}</td>
+                <td>${record.entry}</td>
+                <td>${record.exit}</td>
+            </tr>
+        `;
+        });
+
+        htmlContent += `</tbody></table>`;
+
+        // שולחים את ה-HTML לדפדפן
+        res.send(htmlContent);
+    });
 });
 
 // אתחול השרת
