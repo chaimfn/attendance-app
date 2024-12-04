@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="he">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דוח נוכחות</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        button {
+            font-size: 16px;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>דוח נוכחות</h1>
+
+    <button id="entryButton">כניסה</button>
+    <button id="exitButton">יציאה</button>
+    <button id="reportButton">הצג דוח</button>
+
+    <script>
+        document.getElementById('entryButton').addEventListener('click', function () {
+            fetch('/entry', { method: 'POST' })
+                .then(response => response.text())
+                .then(data => alert(data));
+        });
+
+        document.getElementById('exitButton').addEventListener('click', function () {
+            fetch('/exit', { method: 'POST' })
+                .then(response => response.text())
+                .then(data => alert(data));
+        });
+
+        document.getElementById('reportButton').addEventListener('click', function () {
+            window.location.href = '/report';
+        });
+    </script>
+
+</body>
+
+</html>
