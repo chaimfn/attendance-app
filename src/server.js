@@ -13,6 +13,7 @@ app.use(express.json()); // תמיכה בקלט JSON
 
 // שם הקובץ שהאפליקציה תכתוב אליו
 const currentMonth = moment().tz(TZ).format('YYYY-MM');
+const dataDir = './data';  // תיקיית ה-CSV
 const csvFileName = `./data/${currentMonth}.csv`;
 
 // פונקציה לעדכון דוח הנוכחות
@@ -122,13 +123,35 @@ app.post('/exit', (req, res) => {
     res.send('יציאה תועדה');
 });
 
+// נתיב שמחזיר את רשימת החודשים הקיימים במערכת
+app.get('/months', (req, res) => {
+    fs.readdir(dataDir, (err, files) => {
+        if (err) {
+            return res.status(500).send('Error reading files from the data directory');
+        }
+
+        // סינון רק קבצי CSV (קבצים שמתחילים ב-YYYY-MM)
+        const months = files.filter(file => file.endsWith('.csv'))
+            .map(file => file.replace('.csv', ''));  // חותך את הסיומת .csv
+
+        // מחזירים את רשימת החודשים
+        res.json(months);
+    });
+});
+
 // נתיב להורדת דוח נוכחות (הצגת דוח)
-app.get('/report/download', (req, res) => {
+app.get('/report/download/:month', (req, res) => {
+    const month = req.params.month;
+    const csvFileName = path.join(dataDir, `${month}.csv`);
     res.sendFile(path.join(__dirname, csvFileName));
 });
 
 // נתיב להצגת דוח נוכחות כ-HTML
-app.get('/report/get', (req, res) => {
+// נתיב להצגת דוח נוכחות כ-HTML עבור חודש נבחר
+app.get('/report/get/:month', (req, res) => {
+    const month = req.params.month;
+    const csvFileName = path.join(dataDir, `${month}.csv`);
+
     fs.readFile(csvFileName, 'utf8', (err, data) => {
         if (err) {
             return res.status(500).send('Error reading the attendance report');
@@ -145,32 +168,32 @@ app.get('/report/get', (req, res) => {
             };
         }).filter(record => record.dayOfMonth && record.dayOfWeek && record.entry && record.exit);  // מסננים שורות ריקות
 
+        // יצירת HTML עם טבלה
         let htmlContent = `
-        <table>
-            <thead>
+            <table>
                 <tr>
                     <th>תאריך</th>
                     <th>יום</th>
                     <th>כניסה</th>
                     <th>יציאה</th>
                 </tr>
-            </thead>
-            <tbody>
-    `;
+        `;
 
         // הוספת כל הרשומות לטבלה
         records.forEach(record => {
             htmlContent += `
-            <tr>
-                <td>${record.dayOfMonth}</td>
-                <td>${record.dayOfWeek}</td>
-                <td>${record.entry}</td>
-                <td>${record.exit}</td>
-            </tr>
-        `;
+                <tr>
+                    <td>${record.dayOfMonth}</td>
+                    <td>${record.dayOfWeek}</td>
+                    <td>${record.entry}</td>
+                    <td>${record.exit}</td>
+                </tr>
+            `;
         });
 
-        htmlContent += `</tbody></table>`;
+        htmlContent += `
+            </table>
+        `;
 
         // שולחים את ה-HTML לדפדפן
         res.send(htmlContent);
