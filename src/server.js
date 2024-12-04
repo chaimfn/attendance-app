@@ -16,8 +16,12 @@ const csvFileName = `./data/${currentMonth}.csv`;
 
 // פונקציה לעדכון דוח הנוכחות
 function logAttendance(action) {
-    const currentDay = moment().format('DD');
-    const currentTime = moment().format('HH:mm:ss');
+    const currentDay = moment().format('DD'); // מספר היום
+    const currentWeekday = moment().format('ddd'); // שם היום בשבוע
+    const currentTime = moment().format('HH:mm'); // זמן בלי שניות (רק שעה ודקה)
+
+    // עיצוב היום בשבוע בצורה: "04 - ראשון" (יום + היום בשבוע)
+    const formattedDay = `${currentDay} - ${currentWeekday}`;
 
     // אם הקובץ לא קיים, ניצור אותו עם כותרות ראשוניות
     if (!fs.existsSync(csvFileName)) {
@@ -47,36 +51,36 @@ function logAttendance(action) {
         });
 
         // בדיקה אם יש כבר רשומה עם כניסה לאותו יום
-        const existingRecord = records.find(record => record.day === currentDay && record.entry !== '' && record.exit === '');
+        const existingRecord = records.find(record => record.day === formattedDay && record.entry !== '' && record.exit === '');
 
         if (action === 'Entry') {
             if (existingRecord) {
                 // אם קיימת רשומת כניסה ללא יציאה, לא נעשה דבר (הכניסה כבר רשומה).
-                console.log('Entry already recorded for today:', currentDay);
+                console.log('Entry already recorded for today:', formattedDay);
             } else {
                 // אם לא קיימת כניסת יום, נוסיף כניסה חדשה
                 const newRecord = {
-                    day: currentDay,
+                    day: formattedDay,
                     entry: currentTime,
                     exit: ''
                 };
                 records.push(newRecord);
-                console.log('Entry recorded for today:', currentDay, currentTime);
+                console.log('Entry recorded for today:', formattedDay, currentTime);
             }
         } else if (action === 'Exit') {
             if (existingRecord) {
                 // אם קיימת כניסת יום, נוסיף את זמן היציאה באותה שורה
                 existingRecord.exit = currentTime;
-                console.log('Exit recorded for today:', currentDay, currentTime);
+                console.log('Exit recorded for today:', formattedDay, currentTime);
             } else {
                 // אם אין כניסת יום, נוסיף שורה עם יציאה בלבד
                 const newRecord = {
-                    day: currentDay,
+                    day: formattedDay,
                     entry: '',
                     exit: currentTime
                 };
                 records.push(newRecord);
-                console.log('Exit recorded for today (without entry):', currentDay, currentTime);
+                console.log('Exit recorded for today (without entry):', formattedDay, currentTime);
             }
         }
 
@@ -91,7 +95,7 @@ function logAttendance(action) {
         });
 
         csvWriter.writeRecords(records)
-            .then(() => console.log('Attendance record updated:', currentDay, action, currentTime));
+            .then(() => console.log('Attendance record updated:', formattedDay, action, currentTime));
     });
 }
 
