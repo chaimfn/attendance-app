@@ -25,10 +25,10 @@ function logAttendance(action) {
         const csvWriter = createObjectCsvWriter({
             path: csvFileName,
             header: [
-                { id: 'dayOfMonth', title: 'DayOfMonth' },  // היום בחודש
-                { id: 'dayOfWeek', title: 'DayOfWeek' },    // היום בשבוע
-                { id: 'entry', title: 'Entry' },             // כניסה
-                { id: 'exit', title: 'Exit' }                // יציאה
+                { id: 'dayOfMonth', title: 'תאריך' },  // היום בחודש
+                { id: 'dayOfWeek', title: 'יום' },    // היום בשבוע
+                { id: 'entry', title: 'כניסה' },             // כניסה
+                { id: 'exit', title: 'יציאה' }                // יציאה
             ]
         });
         csvWriter.writeRecords([]); // כותבים רשומות ראשוניות ריקות
@@ -56,11 +56,12 @@ function logAttendance(action) {
         // אם יש רשומת כניסה פתוחה (שאין יציאה בשלב זה)
         const existingEntry = records.find(record => record.dayOfMonth === formattedDayOfMonth && record.entry !== '' && record.exit === '');
 
-        if (action === 'Entry') {
+        if (action === 'entry') {
             if (existingEntry) {
                 // אם יש כניסה פתוחה, לא נוסיף שורה חדשה
                 console.log('Entry already recorded for today:', formattedDayOfMonth, formattedDayOfWeek);
-            } else {
+            } 
+            else {
                 // אם לא קיימת כניסת יום, נוסיף כניסה חדשה בשורה נפרדת
                 const newRecord = {
                     dayOfMonth: formattedDayOfMonth,
@@ -71,12 +72,14 @@ function logAttendance(action) {
                 records.push(newRecord);
                 console.log('Entry recorded for today:', formattedDayOfMonth, formattedDayOfWeek, currentTime);
             }
-        } else if (action === 'Exit') {
+        } 
+        else if (action === 'exit') {
             if (existingEntry) {
                 // אם יש כניסה פתוחה, נוסיף את זמן היציאה באותה שורה
                 existingEntry.exit = currentTime;
                 console.log('Exit recorded for today:', formattedDayOfMonth, formattedDayOfWeek, currentTime);
-            } else {
+            } 
+            else {
                 // אם אין כניסת יום פתוחה, נוסיף יציאה בשורה חדשה
                 const newRecord = {
                     dayOfMonth: formattedDayOfMonth,
@@ -93,10 +96,10 @@ function logAttendance(action) {
         const csvWriter = createObjectCsvWriter({
             path: csvFileName,
             header: [
-                { id: 'dayOfMonth', title: 'DayOfMonth' },  // היום בחודש
-                { id: 'dayOfWeek', title: 'DayOfWeek' },    // היום בשבוע
-                { id: 'entry', title: 'Entry' },             // כניסה
-                { id: 'exit', title: 'Exit' }                // יציאה
+                { id: 'dayOfMonth', title: 'תאריך' },  // היום בחודש
+                { id: 'dayOfWeek', title: 'יום' },    // היום בשבוע
+                { id: 'entry', title: 'כניסה' },             // כניסה
+                { id: 'exit', title: 'יציאה' }                // יציאה
             ]
         });
 
@@ -105,16 +108,16 @@ function logAttendance(action) {
     });
 }
 
-// נתיב עבור כפתור "Entry"
+// נתיב עבור כפתור "כניסה"
 app.post('/entry', (req, res) => {
-    logAttendance('Entry');
-    res.send('Entry תועדה');
+    logAttendance('entry');
+    res.send('כניסה תועדה');
 });
 
-// נתיב עבור כפתור "Exit"
+// נתיב עבור כפתור "יציאה"
 app.post('/exit', (req, res) => {
-    logAttendance('Exit');
-    res.send('Exit תועדה');
+    logAttendance('exit');
+    res.send('יציאה תועדה');
 });
 
 // נתיב להורדת דוח נוכחות (הצגת דוח)
