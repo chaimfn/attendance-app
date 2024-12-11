@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -6,7 +7,7 @@ const TZ = 'Asia/Jerusalem';
 const { createObjectCsvWriter } = require('csv-writer');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(express.static('public')); // הגדרת תיקיית הסטטיים
 app.use(express.json()); // תמיכה בקלט JSON
